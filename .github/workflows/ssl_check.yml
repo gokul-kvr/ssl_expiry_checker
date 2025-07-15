@@ -1,0 +1,46 @@
+name: Daily SSL Check
+
+on:
+  schedule:
+  - cron: '*/5 * * * *'  # every 5 minutes
+  workflow_dispatch:       # Optional: allow manual  trigger
+
+jobs:
+  ssl-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.11.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.9'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Restore token.json from base64 secret
+        env:
+          TOKEN_JSON_B64: ${{ secrets.TOKEN_JSON_B64 }}
+        run: |
+          echo "$TOKEN_JSON_B64" | base64 --decode > token.json
+
+      - name: Run SSL Checker
+        env:
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_FROM_NAME: ${{ secrets.EMAIL_FROM_NAME }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          GMAIL_OAUTH: ${{ secrets.GMAIL_OAUTH }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          DOMAINS: ${{ secrets.DOMAINS }}
+          WEEKDAY: ${{ secrets.WEEKDAY }}
+          CHECK_HOUR: ${{ secrets.CHECK_HOUR }}
+          CHECK_MINUTE: ${{ secrets.CHECK_MINUTE }}
+        run: |
+          python check_ssl_expiry.py
