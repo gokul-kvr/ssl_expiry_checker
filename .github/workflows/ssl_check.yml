@@ -2,7 +2,7 @@ name: Daily SSL Check
 
 on:
   schedule:
-  - cron: '15 7 * * 3'  # Every Wednesday at 12:45 PM IST (07:15 UTC)
+  - cron: '0 4 * * 6'  # Every Saturday at 9:30 AM IST (04:00 UTC)
   workflow_dispatch:       # Optional: allow manual  trigger
 
 jobs:
